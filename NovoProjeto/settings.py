@@ -82,10 +82,10 @@ WSGI_APPLICATION = 'NovoProjeto.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': os.environ.get('DB_NAME', 'postgres'),
-        'USER': os.environ.get('DB_USER', 'postgres'),
-        'PASSWORD': os.environ.get('DB_PASS', '472315@fla'),
-        'HOST': 'localhost',
+        'NAME': os.environ.get('DB_NAME', 'dd4gde67058vfr'),
+        'USER': os.environ.get('DB_USER', 'ecdbgqieebfpoi'),
+        'PASSWORD': os.environ.get('DB_PASS', 'f27bad6ea1cb49374f9ab9b7984209bcb9e413d57ca35ff12a3e220ebd876ad6'),
+        'HOST': 'ec2-54-165-164-38.compute-1.amazonaws.com',
         'PORT': '5432'
     }
 }
