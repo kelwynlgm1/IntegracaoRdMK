@@ -1,0 +1,26 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>API REST - MK SOLUTIONS</title>
+    <link rel="stylesheet" href="{% static 'css/estilo.css' %}">
+</head>
+<body>
+    <div class="div1">
+        <img src="{% static 'images/unnamed.png' %}"/>
+        <h1>API REST - MK SOLUTIONS/RD STATION</h1>
+        <button name="button1" type="submit" onclick="location.href='{% url 'admin:index' %}'"
+        >Visualizar Leads</button>
+        <form method="post" action="{% url 'clientes:update_nao_cadastrados' %}">
+            {% csrf_token %}
+        <input name="button3" type="submit" value="Atualizar Nao Cadastrados">
+        </form>
+        <form method="post" action="{% url 'clientes:update_cadastrados' %}">
+            {% csrf_token %}
+        <input name="button4" type="submit" value="Atualizar Cadastrados">
+        </form>
+    </div>
+
+</body>
+</html>
