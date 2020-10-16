@@ -1,10 +1,11 @@
 from django.urls import path
 
 from .views import PostAPIView, ClientesApiView, CadastradoApiView, NaoCadastradoApiView, InstaladoApiView, \
-    update_cliente, update_cliente_cadastrado, UpdateApiView
+    update_cliente, update_cliente_cadastrado, UpdateApiView, get_response
 
 app_name = 'clientes'
 urlpatterns = [
+    path('cron/get', get_response, name='get_response'),
     path('adiciona/clientes', PostAPIView.as_view(), name='clientes'),
     path('update/clientes', UpdateApiView.as_view(), name='update-_clientes'),
     path('visualiza/cadastrados', CadastradoApiView.as_view(), name='cadastrados'),

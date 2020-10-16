@@ -18,8 +18,8 @@ def index(request):
     return render(request, 'index.html')
 
 
-def atualizado(request):
-    return render(request, 'atualizado.html')
+def get_response(request):
+    return HttpResponse("OK")
 
 
 class PostAPIView(APIView):
@@ -29,10 +29,10 @@ class PostAPIView(APIView):
 
     def post(self, request):
         retorno = request.data['leads'][0]['last_conversion']['content']
-        celular = request.data['leads'][0]['mobile_phone']
-        if celular is None:
-            celular = request.data['leads'][0]['personal_phone']
-        print("***", celular)
+        telefone = request.data['leads'][0]['mobile_phone']
+        if telefone is None:
+            telefone = request.data['leads'][0]['personal_phone']
+        print("***", telefone)
         if retorno['Você já é nosso cliente?'] == "Ainda não sou cliente":
             retorno_query1, retorno_query2 = consulta_banco(retorno['email_lead'])
             cod_pessoa, cod_conexao, plano_acesso = tratamento_dados(retorno_query1, retorno_query2)
@@ -42,7 +42,7 @@ class PostAPIView(APIView):
                     "nome": retorno['Nome'],
                     "email": retorno['email_lead'],
                     "cidade": retorno['Sua cidade'],
-                    "telefone": celular,
+                    "telefone": telefone,
                 }
                 serializer = serializar_nao_cadastrado(dados_lead)
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -51,7 +51,7 @@ class PostAPIView(APIView):
                     "nome": retorno['Nome'],
                     "email": retorno['email_lead'],
                     "cidade": retorno['Sua cidade'],
-                    "telefone": celular,
+                    "telefone": telefone,
                     "cod_pessoa": cod_pessoa
                 }
                 serializer = serializar_cadastrado(dados_lead)
@@ -61,7 +61,7 @@ class PostAPIView(APIView):
                     "nome": retorno['Nome'],
                     "email": retorno['email_lead'],
                     "cidade": retorno['Sua cidade'],
-                    "telefone": celular,
+                    "telefone": telefone,
                     "cod_conexao": cod_conexao,
                     "cod_pessoa": cod_pessoa,
                     "plano_acesso": plano_acesso
@@ -73,7 +73,7 @@ class PostAPIView(APIView):
                     "nome": retorno['Nome'],
                     "email": retorno['email_lead'],
                     "cidade": "Cidade não informada",
-                    "telefone": celular,
+                    "telefone": telefone,
                 }
                 serializer = serializar_nao_cadastrado(dados_lead)
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -82,7 +82,7 @@ class PostAPIView(APIView):
                     "nome": retorno['Nome'],
                     "email": retorno['email_lead'],
                     "cidade": "Cidade não informada",
-                    "telefone": celular,
+                    "telefone": telefone,
                     "cod_pessoa": cod_pessoa
                 }
                 serializer = serializar_cadastrado(dados_lead)
@@ -92,7 +92,7 @@ class PostAPIView(APIView):
                     "nome": retorno['Nome'],
                     "email": retorno['email_lead'],
                     "cidade": "Cidade não informada",
-                    "telefone": celular,
+                    "telefone": telefone,
                     "cod_conexao": cod_conexao,
                     "cod_pessoa": cod_pessoa,
                     "plano_acesso": plano_acesso
@@ -221,19 +221,23 @@ class ClientesApiView(APIView):
 
     def post(self, request):
         retorno = request.data['leads'][0]['last_conversion']['content']
+        telefone = request.data['leads'][0]['mobile_phone']
+        if telefone is None:
+            telefone = request.data['leads'][0]['personal_phone']
+        print("***", telefone)
         if retorno.get('Sua cidade') is not None:
             dados_lead2 = {
                 "nome": retorno['Nome'],
                 "email": retorno['email_lead'],
                 "cidade": retorno['Sua cidade'],
-                "telefone": retorno['Celular'],
+                "telefone": telefone
             }
         elif retorno.get('Sua cidade') is None:
             dados_lead2 = {
                 "nome": retorno['Nome'],
                 "email": retorno['email_lead'],
                 "cidade": "Cidade não informada",
-                "telefone": retorno['Celular'],
+                "telefone": telefone
             }
         serializer = serializar_cliente(dados_lead2)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
