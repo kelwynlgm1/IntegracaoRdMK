@@ -1,6 +1,7 @@
 import json
 
 import requests
+from django.http import HttpResponse
 from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -28,73 +29,77 @@ class PostAPIView(APIView):
 
     def post(self, request):
         retorno = request.data['leads'][0]['last_conversion']['content']
-        print(retorno)
-        retorno_query1, retorno_query2 = consulta_banco(retorno['email_lead'])
-        cod_pessoa, cod_conexao, plano_acesso = tratamento_dados(retorno_query1, retorno_query2)
-        cidade_cliente = retorno.get('Sua cidade')
-        print(cod_pessoa, cod_conexao, plano_acesso)
-        if cidade_cliente is not None and cod_pessoa is None and cod_conexao is None:
-            dados_lead = {
-                "nome": retorno['Nome'],
-                "email": retorno['email_lead'],
-                "cidade": retorno['Sua cidade'],
-                "telefone": retorno['Celular'],
-            }
-            serializer = serializar_nao_cadastrado(dados_lead)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        if cidade_cliente is not None and cod_pessoa is not None and cod_conexao is None:
-            dados_lead = {
-                "nome": retorno['Nome'],
-                "email": retorno['email_lead'],
-                "cidade": retorno['Sua cidade'],
-                "telefone": retorno['Celular'],
-                "cod_pessoa": cod_pessoa
-            }
-            serializer = serializar_cadastrado(dados_lead)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        if cidade_cliente is not None and cod_pessoa is not None and cod_conexao is not None:
-            dados_lead = {
-                "nome": retorno['Nome'],
-                "email": retorno['email_lead'],
-                "cidade": retorno['Sua cidade'],
-                "telefone": retorno['Celular'],
-                "cod_conexao": cod_conexao,
-                "cod_pessoa": cod_pessoa,
-                "plano_acesso": plano_acesso
-            }
-            serializer = serializar_instalado(dados_lead)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        if cidade_cliente is None and cod_pessoa is None and cod_conexao is None:
-            dados_lead = {
-                "nome": retorno['Nome'],
-                "email": retorno['email_lead'],
-                "cidade": "Cidade não informada",
-                "telefone": retorno['Celular'],
-            }
-            serializer = serializar_nao_cadastrado(dados_lead)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        if cidade_cliente is None and cod_pessoa is not None and cod_conexao is None:
-            dados_lead = {
-                "nome": retorno['Nome'],
-                "email": retorno['email_lead'],
-                "cidade": "Cidade não informada",
-                "telefone": retorno['Celular'],
-                "cod_pessoa": cod_pessoa
-            }
-            serializer = serializar_cadastrado(dados_lead)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        if cidade_cliente is None and cod_pessoa is not None and cod_conexao is not None:
-            dados_lead = {
-                "nome": retorno['Nome'],
-                "email": retorno['email_lead'],
-                "cidade": "Cidade não informada",
-                "telefone": retorno['Celular'],
-                "cod_conexao": cod_conexao,
-                "cod_pessoa": cod_pessoa,
-                "plano_acesso": plano_acesso
-            }
-            serializer = serializar_instalado(dados_lead)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        celular = request.data['leads'][0]['mobile_phone']
+        if celular is None:
+            celular = request.data['leads'][0]['personal_phone']
+        print("***", celular)
+        if retorno['Você já é nosso cliente?'] == "Ainda não sou cliente":
+            retorno_query1, retorno_query2 = consulta_banco(retorno['email_lead'])
+            cod_pessoa, cod_conexao, plano_acesso = tratamento_dados(retorno_query1, retorno_query2)
+            cidade_cliente = retorno.get('Sua cidade')
+            if cidade_cliente is not None and cod_pessoa is None and cod_conexao is None:
+                dados_lead = {
+                    "nome": retorno['Nome'],
+                    "email": retorno['email_lead'],
+                    "cidade": retorno['Sua cidade'],
+                    "telefone": celular,
+                }
+                serializer = serializar_nao_cadastrado(dados_lead)
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            if cidade_cliente is not None and cod_pessoa is not None and cod_conexao is None:
+                dados_lead = {
+                    "nome": retorno['Nome'],
+                    "email": retorno['email_lead'],
+                    "cidade": retorno['Sua cidade'],
+                    "telefone": celular,
+                    "cod_pessoa": cod_pessoa
+                }
+                serializer = serializar_cadastrado(dados_lead)
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            if cidade_cliente is not None and cod_pessoa is not None and cod_conexao is not None:
+                dados_lead = {
+                    "nome": retorno['Nome'],
+                    "email": retorno['email_lead'],
+                    "cidade": retorno['Sua cidade'],
+                    "telefone": celular,
+                    "cod_conexao": cod_conexao,
+                    "cod_pessoa": cod_pessoa,
+                    "plano_acesso": plano_acesso
+                }
+                serializer = serializar_instalado(dados_lead)
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            if cidade_cliente is None and cod_pessoa is None and cod_conexao is None:
+                dados_lead = {
+                    "nome": retorno['Nome'],
+                    "email": retorno['email_lead'],
+                    "cidade": "Cidade não informada",
+                    "telefone": celular,
+                }
+                serializer = serializar_nao_cadastrado(dados_lead)
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            if cidade_cliente is None and cod_pessoa is not None and cod_conexao is None:
+                dados_lead = {
+                    "nome": retorno['Nome'],
+                    "email": retorno['email_lead'],
+                    "cidade": "Cidade não informada",
+                    "telefone": celular,
+                    "cod_pessoa": cod_pessoa
+                }
+                serializer = serializar_cadastrado(dados_lead)
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            if cidade_cliente is None and cod_pessoa is not None and cod_conexao is not None:
+                dados_lead = {
+                    "nome": retorno['Nome'],
+                    "email": retorno['email_lead'],
+                    "cidade": "Cidade não informada",
+                    "telefone": celular,
+                    "cod_conexao": cod_conexao,
+                    "cod_pessoa": cod_pessoa,
+                    "plano_acesso": plano_acesso
+                }
+                serializer = serializar_instalado(dados_lead)
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return HttpResponse("Já é cliente. Lead não contabilizada", status=status.HTTP_200_OK)
 
 
 class UpdateApiView(APIView):
@@ -241,14 +246,14 @@ class ClientesApiView(APIView):
 
 def update_cliente(request):
     if request.method == "POST":
-        link = requests.get('http://127.0.0.1:8000/api/v1/visualiza/nao_cadastrados')
+        link = requests.get('https://novaapirdmk-kl.herokuapp.com/api/v1/visualiza/nao_cadastrados')
         retorno = json.loads(link.text)
         for retorno in retorno:
             print("***", retorno)
             query1, query2 = consulta_banco(retorno['email'])
             cod_pessoa, cod_conexao, plano_acesso = tratamento_dados(query1, query2)
             if cod_pessoa is not None:
-                link_delete = 'http://127.0.0.1:8000/api/v1/deleta/nao_cadastrados/' + str(retorno['id']) + '/'
+                link_delete = 'https://novaapirdmk-kl.herokuapp.com/api/v1/deleta/nao_cadastrados/' + str(retorno['id']) + '/'
                 deleta = requests.delete(url=link_delete)
                 assert deleta.status_code == 204
                 dados_lead = {
@@ -257,7 +262,7 @@ def update_cliente(request):
                     "cidade": retorno['cidade'],
                     "telefone": retorno['telefone']
                 }
-                link_post = "http://127.0.0.1:8000/api/v1/update/clientes"
+                link_post = "https://novaapirdmk-kl.herokuapp.com/api/v1/update/clientes"
                 envio = requests.post(url=link_post, data=dados_lead)
                 assert envio.status_code == 201
         return render(request, 'atualizado.html')
@@ -267,14 +272,14 @@ def update_cliente(request):
 
 def update_cliente_cadastrado(request):
     if request.method == "POST":
-        link = requests.get('http://127.0.0.1:8000/api/v1/visualiza/cadastrados')
+        link = requests.get('https://novaapirdmk-kl.herokuapp.com/api/v1/visualiza/cadastrados')
         retorno = json.loads(link.text)
         for retorno in retorno:
             print("***", retorno)
             query1, query2 = consulta_banco(retorno['email'])
             cod_pessoa, cod_conexao, plano_acesso = tratamento_dados(query1, query2)
             if cod_conexao is not None:
-                link_delete = 'http://127.0.0.1:8000/api/v1/deleta/cadastrados/' + str(retorno['id']) + '/'
+                link_delete = 'https://novaapirdmk-kl.herokuapp.com/api/v1/deleta/cadastrados/' + str(retorno['id']) + '/'
                 deleta = requests.delete(url=link_delete)
                 assert deleta.status_code == 204
                 dados_lead = {
@@ -283,7 +288,7 @@ def update_cliente_cadastrado(request):
                     "cidade": retorno['cidade'],
                     "telefone": retorno['telefone']
                 }
-                link_post = "http://127.0.0.1:8000/api/v1/update/clientes"
+                link_post = "https://novaapirdmk-kl.herokuapp.com/api/v1/update/clientes"
                 envio = requests.post(url=link_post, data=dados_lead)
                 assert envio.status_code == 201
         return render(request, 'atualizado.html')
